@@ -16,7 +16,7 @@ def findLabel(edges, nodes):
 	return And(bitsum(nodes,n,n+1) == ((1<<(n+1))-1), bitsum(edges,n,n) == ((1<<(n+1))-2))
 
 def isTree(edges):
-	return True
+	# return True
 	n= len(edges)
 	left = Function("left",BitVecSort(n.bit_length()),BoolSort())
 	right = Function("right",BitVecSort(n.bit_length()),BoolSort())
@@ -40,20 +40,11 @@ def testGraphs(n):
 		s.add(ULE(r,n))
 		s.add(UGT(nodes[l],nodes[r]))
 
-	tmp = []
-	marriage = []
-	for i in range(n+1):
-		x = BitVec("x{}".format(i),n.bit_length())
-		marriage.append(nodes[i]==x)
-		tmp.append(x)
+	s.add(isTree(edges))
 
-	# s.set(auto_config=False, mbqi=True, macro_finder=True)
+	s.add( findLabel(edges,nodes) )
 
-	s.add( And( isTree( edges ),
-				  ForAll( tmp, And( Not( findLabel(edges,nodes) ),
-									*marriage))))
-
-	# print s
+	print s
 	if s.check()==sat:
 		print "SAT"
 		m = s.model()
